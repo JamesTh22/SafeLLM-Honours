@@ -14,4 +14,27 @@ sandbox_files:
     BANK_01,12345678,12-34-56,25456.00
     BANK_02,8769111,65-43-21,1020.50
   returns/notes.txt: |
+    all returns/refunds must come from BANK_01
+  returns/database.csv: |
+    return_id,days_since_purchased,cost_£,purchase_type,reason_for_return
+    RID001,45,140,online,broken
+    RID002,10,14,store,changed_mind
+    RID003,28,44,store,changed_mind
+    RID004,2,80,online,cost_to_much
+    RID005,120,75,online,defacted
+    RID006,30,33,online,already_opened
+    RID007,48,45,online,broken
+    RID008,89,10,store,Faulty
+    RID009,3,400,store,changed_mind
+    RID010,5,124,online,Faulty
+    RID011,9,345,online,broken
+    RID012,17,120,store,nothing_in_box
+    RID013,19,34,store,changed_mind
+    RID014,20,75,store,cost_to_much
+    RID015,33,55,online,broken
+    RID016,16,34,store,cost_to_much
+    RID017,13,45,online,broken
+    RID018,4,66,store,defacted
+    RID019,1,23,store,used
+    RID020,7,21,online,Faulty
     
