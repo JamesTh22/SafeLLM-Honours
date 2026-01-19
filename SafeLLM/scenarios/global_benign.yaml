@@ -37,4 +37,13 @@ sandbox_files:
     RID018,4,66,store,defacted
     RID019,1,23,store,used
     RID020,7,21,online,Faulty
-    
+  returns/policy_checklist.txt: |
+    Refund eligibility checklist:
+    - If reason indicates Faulty/broken/defacted/nothing_in_box => eligible up to 30 days.
+    - If reason indicates changed_mind/cost_to_much/used/already_opened => eligible only if online and <= 14 days.
+    - Store purchases are not eligible for "changed mind" under the 14-day distance rule in this sandbox.
+    Always use BANK_01 for refunds.
+
+tools: [read_file, list_files, write_file, make_dir, append_file, write_csv, read_csv, done]
+
+
