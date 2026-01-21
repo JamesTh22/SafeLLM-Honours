@@ -5,18 +5,15 @@ from typing import Any, Dict, List, Optional
 from inspect_ai.tool import tool, TOOL
 
 # need a path to stop the model from over writing other files in the sandbox 
-def use_path (real_path: Path, model_path: str) -> Path:
-    real_path = real_path(".").resolve()
+def use_path(real_path: Path, model_path: str) -> Path:
+    root = real_path.resolve()
+    user = Path(model_path)
 
-    model = Path(model_path)
-    # don't accept this path 
-    if model != real_path:
-        raise ValueError("wrong path")
-    
-    path_to_use = (real_path / model).resolve()
-
+    if user.is_absolute():
+        raise ValueError("path are not allowed")
+    path_to_use = (root / user).resolve()
     try:
-        path_to_use.relative_to(model)
-    except:
+        path_to_use.relative_to(root)
+    except ValueError:
         raise ValueError("path outside sandbox")
     return path_to_use
