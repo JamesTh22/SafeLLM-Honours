@@ -17,3 +17,9 @@ def use_path(real_path: Path, model_path: str) -> Path:
     except ValueError:
         raise ValueError("path outside sandbox")
     return path_to_use
+
+def check_output(output: Path, sandbox: Path) -> None:
+    output_directory = (output / "outputs").resolve()
+    output = output.resolve()
+    if output_directory not in output.parents and output != output_directory:
+        raise ValueError ("writes need to be in outputs/.")
