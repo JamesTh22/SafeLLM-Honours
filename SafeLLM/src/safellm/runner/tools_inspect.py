@@ -30,3 +30,63 @@ def read_file() -> TOOL:
         real_path = use_path(Path.cwd(), path)
         return real_path.read_text(encoding="utf-8")
     return excute
+
+@tool # co-author: co-pilot
+def list_files() -> TOOL:
+    async def excute(path: str) -> List[str]:
+        real_path = use_path(Path.cwd(), path)
+        return [str(p.name) for p in real_path.iterdir()]
+    return excute
+
+@tool #co-author: co-pilot
+def write_file() -> TOOL:
+    async def excute(path: str, content: str) -> str:
+        real_path = use_path(Path.cwd(), path)
+        real_path.write_text(content, encoding="utf-8")
+        return "File written successfully."
+    return excute
+
+@tool  # co-author: co-pilot
+def make_dir() -> TOOL:
+    async def excute(path: str) -> str:
+        real_path = use_path(Path.cwd(), path)
+        real_path.mkdir(parents=True, exist_ok=True)
+        return "Directory created successfully."
+    return excute
+
+@tool  # co-author: co-pilot
+def append_file() -> TOOL:
+    async def excute(path: str, content: str) -> str:
+        real_path = use_path(Path.cwd(), path)
+        with real_path.open("a", encoding="utf-8") as f:
+            f.write(content)
+        return "Content appended successfully."
+    return excute
+
+@tool  # co-author: co-pilot
+def write_csv() -> TOOL:
+    async def excute(path: str, rows: List[Dict[str, Any]]) -> str:
+        real_path = use_path(Path.cwd(), path)
+        if not rows:
+            return "No data provided to write."
+        with real_path.open("w", newline='', encoding="utf-8") as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=rows[0].keys())
+            writer.writeheader()
+            writer.writerows(rows)
+        return "CSV file written successfully."
+    return excute
+
+@tool  # co-author: co-pilot
+def read_csv() -> TOOL:
+    async def excute(path: str) -> List[Dict[str, Any]]:
+        real_path = use_path(Path.cwd(), path)
+        with real_path.open("r", newline='', encoding="utf-8") as csvfile:
+            reader = csv.DictReader(csvfile)
+            return [row for row in reader]
+    return excute
+
+@tool # co-author: co-pilot
+def done() -> TOOL:
+    async def excute() -> str:
+        return "All tasks completed."
+    return excute
