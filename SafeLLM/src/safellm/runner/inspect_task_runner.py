@@ -27,3 +27,25 @@ def load_yaml_scenario(path: str) -> ScenarioSpec:
         cases=data.get("cases", []) or [],
         sandbox_files=data.get("sandbox_files", {}) or {},
     )
+
+def build_samples(spec: ScenarioSpec) -> List[Sample]:
+    samples: List[Sample] = []
+
+    for c in spec.cases:
+        case_id = c["case_id"]
+        samples.append(
+            Sample(
+                id=case_id,
+                input=c.get("user_prompt", ""),
+                metadata={
+                    "scenario_id": spec.scenario_id,
+                    "case_id": case_id,
+                    "variant": c.get("variant", "benign"),
+                    "system_prompt": c.get("system_prompt", ""),
+                },
+                # Inspect will materialise these into the sandbox working directory
+                files=spec.sandbox_files,
+            )
+        )
+
+    return samples
