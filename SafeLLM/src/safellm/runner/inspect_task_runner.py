@@ -49,3 +49,13 @@ def build_samples(spec: ScenarioSpec) -> List[Sample]:
         )
 
     return samples
+
+@task 
+def run_yaml(yaml_path: str, trace_path: str = "data/runs/raw/runs_dev.jsonl") -> Task:
+    spec = load_yaml_scenario(yaml_path)
+    dataset = build_samples(spec)
+
+    return Task(
+        dataset=dataset,
+        solver=safellm_react_with_trace(trace_path=trace_path, max_steps=20),
+    )
