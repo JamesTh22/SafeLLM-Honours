@@ -23,3 +23,10 @@ def check_output(output: Path, sandbox: Path) -> None:
     output = output.resolve()
     if output_directory not in output.parents and output != output_directory:
         raise ValueError ("writes need to be in outputs/.")
+
+@tool
+def read_file() -> TOOL:
+    async def excute(path: str) -> str:
+        real_path = use_path(Path.cwd(), path)
+        return real_path.read_text(encoding="utf-8")
+    return excute
