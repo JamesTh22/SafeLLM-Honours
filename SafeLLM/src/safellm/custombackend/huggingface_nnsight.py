@@ -29,3 +29,9 @@ class HuggingFaceNNSightBackend:
                 bnb_4bit_quant_type="nf4",    #nf4 is slightly better than fp4 for accuracy / this save more memory 
                 bnb_4bit_compute_dtype=torch.float16
             )    
+        self.model = StandardizedTransformer( # notes that is not "from pretrained" nnterp automatically handdles this
+            model_name,
+            quantization_config=quantization_config,
+            device_map="auto" # allows accelerate to offload to CPU if GPU out of memory
+            trust_remote_code=True # !!this can be a security risk (run verified models only)!!
+        )
