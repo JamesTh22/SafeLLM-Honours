@@ -5,6 +5,10 @@
 # need accelerate (The Transmission):
 # need nnsight wrapper later (The Diagnostic Tool):
 # need to work for multiple different LLMs (The Versatile Body):
+
+## HUGGINGFACE BACKEND WITH NNTERP WHICH USES NNSIGHT FOR INTERPRETABILITY THIS BACKEND ##
+## IS DESIGNED TO GIVE FULL ACCESS AND CONTROL ##
+
 from __future__ import annotations
 from typing import Any, Dict
 import torch
@@ -13,6 +17,17 @@ from transformers import BitsAndBytesConfig
 from nnterp import StandardizedTransformer
 
 global_loaded_model = None # stop re-loading model multiple times
+
+def model_params(model_config: Any=None) -> Dict[str, Any]:
+    params = {
+        "temperature": 0.7, # controlls how creative the model is (higher = more creative)
+        "max_new_tokens": 2048, # if this to short model might stop mid response 
+        "top_p": 0.95, # nucleus sampling do_sample must be true for this to work (controls word dictionary variety)
+        "do_sample": True, # if false it will use greedy decoding mean it pick most likely next word every time
+        "frequency_penalty": 0.0, # stop repeating words / control of repetition
+        "presence_penalty": 0.0, # penalises a word if it has already been used like controlling topics
+        "stop": None, # stop model based of specific tokens
+    }
 
 class HuggingFaceNNSightBackend:
     def __init__(self, model_name: str, quantisation_4bit: bool = True):
