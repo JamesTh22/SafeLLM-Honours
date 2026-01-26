@@ -27,5 +27,5 @@ class HuggingFaceNNSightBackend:
             quantization_config = BitsAndBytesConfig(
                 load_in_4bit=True,
                 bnb_4bit_quant_type="nf4",    #nf4 is slightly better than fp4 for accuracy / this save more memory 
-                bnb_4bit_compute_type=torch.float16
+                bnb_4bit_compute_dtype=torch.float16
             )    
