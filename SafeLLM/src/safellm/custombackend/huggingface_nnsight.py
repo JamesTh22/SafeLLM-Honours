@@ -35,3 +35,6 @@ class HuggingFaceNNSightBackend:
             device_map="auto" # allows accelerate to offload to CPU if GPU out of memory
             trust_remote_code=True # !!this can be a security risk (run verified models only)!!
         )
+        self.tokenizer = self.model.tokenizer
+        self.model_name.model = model_name
+        global_loaded_model = self
