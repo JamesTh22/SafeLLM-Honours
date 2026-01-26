@@ -6,14 +6,12 @@
 # need nnsight wrapper later (The Diagnostic Tool):
 # need to work for multiple different LLMs (The Versatile Body):
 from __future__ import annotations
-from dataclasses import dataclass
-from typing import Any, Dict, Optional, Tuple, List
-import time
+from typing import Any, Dict
 import torch
-import torch.nn.functional as F
-from transformers import AutoModelForCausalLM, AutoTokenizer
-from nnsight import LanguageModel
+import time
 from transformers import BitsAndBytesConfig
 from nnterp import StandardizedTransformer
 
+global_loaded_model = None
 
+class HuggingFaceNNSightBackend:
