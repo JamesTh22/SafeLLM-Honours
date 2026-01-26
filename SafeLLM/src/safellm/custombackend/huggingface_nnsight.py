@@ -28,7 +28,30 @@ def model_params(model_config: Any=None) -> Dict[str, Any]:
         "presence_penalty": 0.0, # penalises a word if it has already been used like controlling topics
         "stop_strings": None, # stop model based of specific tokens
     }
+    if model_config:
+        if hasattr(model_config, "temperature") and model_config.temperature is not None:
+            params["temperature"] = model_config.temperature
+        if hasattr(model_config, "max_tokens") and model_config.max_tokens is not None:
+            params["max_new_tokens"] = model_config.max_tokens
+        elif hasattr(model_config, "max_new_tokens") and model_config.max_new_tokens is not None:
+            params["max_new_tokens"] = model_config.max_new_tokens
+        if hasattr(model_config, "top_p") and model_config.top_p is not None:
+            params["top_p"] = model_config.top_p                                                           # MAPPING TO INSPACT AI PARAM NAMES
+        if hasattr(model_config, "do_sample") and model_config.do_sample is not None:
+            params["do_sample"] = model_config.do_sample
+        if hasattr(model_config, "frequency_penalty") and model_config.frequency_penalty is not None:
+            params["frequency_penalty"] = model_config.frequency_penalty
+        if hasattr(model_config, "presence_penalty") and model_config.presence_penalty is not None:
+            params["presence_penalty"] = model_config.presence_penalty
+        if hasattr(model_config, "stop") and model_config.stop is not None:
+            params["stop_strings"] = model_config.stop
+        elif hasattr(model_config, "stop_strings") and model_config.stop_strings is not None:
+            params["stop_strings"] = model_config.stop_strings
 
+    if params["temperature"] == 0:
+        params["do_sample"] = False
+
+    return params
 
 class HuggingFaceNNSightBackend:
     def __init__(self, model_name: str, quantisation_4bit: bool = True):
