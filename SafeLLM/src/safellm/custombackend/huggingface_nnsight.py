@@ -32,7 +32,7 @@ class HuggingFaceNNSightBackend:
         self.model = StandardizedTransformer( # notes that is not "from pretrained" nnterp automatically handdles this
             model_name,
             quantization_config=quantization_config,
-            device_map="auto" # allows accelerate to offload to CPU if GPU out of memory
+            device_map="auto", # allows accelerate to offload to CPU if GPU out of memory
             trust_remote_code=True # !!this can be a security risk (run verified models only)!!
         )
         self.tokenizer = self.model.tokenizer
