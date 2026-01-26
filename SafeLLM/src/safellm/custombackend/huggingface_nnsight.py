@@ -12,6 +12,20 @@ import time
 from transformers import BitsAndBytesConfig
 from nnterp import StandardizedTransformer
 
-global_loaded_model = None
+global_loaded_model = None # stop re-loading model multiple times
 
 class HuggingFaceNNSightBackend:
+    def __init__(self, model_name: str, quantisation_4bit: bool = True):
+        global global_loaded_model
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        if global_loaded_model is not None and global_loaded_model.model_name == model_name:
+            self.model = global_loaded_model.model
+            self.tokenizer = global_loaded_model.tokenizer
+            return
+        quantization_config = None
+        if quantisation_4bit:
+            quantization_config = BitsAndBytesConfig(
+                load_in_4bit=True,
+                bnb_4bit_quant_type="nf4",    #nf4 is slightly better than fp4 for accuracy / this save more memory 
+                bnb_4bit_compute_type=torch.float16
+            )    
