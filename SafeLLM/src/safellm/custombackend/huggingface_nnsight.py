@@ -26,8 +26,9 @@ def model_params(model_config: Any=None) -> Dict[str, Any]:
         "do_sample": True, # if false it will use greedy decoding mean it pick most likely next word every time
         "frequency_penalty": 0.0, # stop repeating words / control of repetition
         "presence_penalty": 0.0, # penalises a word if it has already been used like controlling topics
-        "stop": None, # stop model based of specific tokens
+        "stop_strings": None, # stop model based of specific tokens
     }
+
 
 class HuggingFaceNNSightBackend:
     def __init__(self, model_name: str, quantisation_4bit: bool = True):
