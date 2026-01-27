@@ -17,7 +17,7 @@ class MessageRecord:
     tool_calls: Optional[List[ToolCallRecord]] = None
 
 @dataclass
-class EpisodeRecord:
+class EpisodeTrace:
     scenario_id: str
     case_id: str
     variant: str

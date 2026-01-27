@@ -2,7 +2,7 @@ from __future__ import annotations
 import csv
 from pathlib import Path
 from typing import Any, Dict, List, Optional
-from inspect_ai.tool import tool, TOOL
+from inspect_ai.tool import tool, Tool
 
 # need a path to stop the model from over writing other files in the sandbox 
 def use_path(real_path: Path, model_path: str) -> Path:
@@ -25,21 +25,21 @@ def check_output(output: Path, sandbox: Path) -> None:
         raise ValueError ("writes need to be in outputs/.")
 
 @tool
-def read_file() -> TOOL:
+def read_file() -> Tool:
     async def excute(path: str) -> str:
         real_path = use_path(Path.cwd(), path)
         return real_path.read_text(encoding="utf-8")
     return excute
 
 @tool # co-author: co-pilot
-def list_files() -> TOOL:
+def list_files() -> Tool:
     async def excute(path: str) -> List[str]:
         real_path = use_path(Path.cwd(), path)
         return [str(p.name) for p in real_path.iterdir()]
     return excute
 
 @tool #co-author: co-pilot
-def write_file() -> TOOL:
+def write_file() -> Tool:
     async def excute(path: str, content: str) -> str:
         real_path = use_path(Path.cwd(), path)
         real_path.write_text(content, encoding="utf-8")
@@ -47,7 +47,7 @@ def write_file() -> TOOL:
     return excute
 
 @tool  # co-author: co-pilot
-def make_dir() -> TOOL:
+def make_dir() -> Tool:
     async def excute(path: str) -> str:
         real_path = use_path(Path.cwd(), path)
         real_path.mkdir(parents=True, exist_ok=True)
@@ -55,7 +55,7 @@ def make_dir() -> TOOL:
     return excute
 
 @tool  # co-author: co-pilot
-def append_file() -> TOOL:
+def append_file() -> Tool:
     async def excute(path: str, content: str) -> str:
         real_path = use_path(Path.cwd(), path)
         with real_path.open("a", encoding="utf-8") as f:
@@ -64,7 +64,7 @@ def append_file() -> TOOL:
     return excute
 
 @tool  # co-author: co-pilot
-def write_csv() -> TOOL:
+def write_csv() -> Tool:
     async def excute(path: str, rows: List[Dict[str, Any]]) -> str:
         real_path = use_path(Path.cwd(), path)
         if not rows:
@@ -77,7 +77,7 @@ def write_csv() -> TOOL:
     return excute
 
 @tool  # co-author: co-pilot
-def read_csv() -> TOOL:
+def read_csv() -> Tool:
     async def excute(path: str) -> List[Dict[str, Any]]:
         real_path = use_path(Path.cwd(), path)
         with real_path.open("r", newline='', encoding="utf-8") as csvfile:
@@ -86,7 +86,7 @@ def read_csv() -> TOOL:
     return excute
 
 @tool # co-author: co-pilot
-def done() -> TOOL:
+def done() -> Tool:
     async def excute() -> str:
         return "All tasks completed."
     return excute
