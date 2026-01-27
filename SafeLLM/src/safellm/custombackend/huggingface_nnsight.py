@@ -57,6 +57,7 @@ class HuggingFaceNNSightBackend:
     def __init__(self, model_name: str, quantisation_4bit: bool = True):
         global global_loaded_model
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.model_name = model_name
         if global_loaded_model is not None and global_loaded_model.model_name == model_name:
             self.model = global_loaded_model.model
             self.tokenizer = global_loaded_model.tokenizer
