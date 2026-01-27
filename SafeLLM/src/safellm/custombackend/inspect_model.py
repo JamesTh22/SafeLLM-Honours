@@ -16,7 +16,7 @@ class Backend(Model):
         self.backendargs = kwargs                      # store the auguments for the backend 
         self.backend = None     
     async def generate(
-            self, 
+        self, 
         input: List[ChatMessage], 
         tools: List[Any] = [], 
         tool_choice: Any = None, 
@@ -25,5 +25,20 @@ class Backend(Model):
         
         if self.backend is None:
             self.backend = HuggingFaceNNSightBackend(self.name, **self.backend_args)  # initisalise the backend only once
+            model_chat_message = [{"role": msg.role, "content": msg.content} for msg in input]
+            prompt = self.backend.tokenizer.apply_chat_template(            # coverts string in to a chat format for the model to understand
+                model_chat_message,                                         # uses the offical apply chat template this normlises stuff for different models
+                tokenize=False,                                             # since every model has it own config.json which is different       
+                add_generation_prompt=True
+            )
+        def run_on_gpu():
+            return self.backend.generateloop(prompt, config=config)
+        result = await asyncio.to_thread(run_on_gpu)  # run the blocking gpu code in a thread
 
-          
+        return ModelOutput(
+            model_name=self.name,
+            completion=result["completion"],
+            metadata={
+                "activation": result["activation"]
+            }
+        )
