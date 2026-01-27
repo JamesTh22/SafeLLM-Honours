@@ -57,5 +57,5 @@ def run_yaml(yaml_path: str, trace_path: str = "data/runs/raw/runs_dev.jsonl") -
 
     return Task(
         dataset=dataset,
-        solver=safellm_react_with_trace(trace_path=trace_path, max_steps=20),
+        solver=safellm_react_with_trace(trace_path=trace_path),
     )

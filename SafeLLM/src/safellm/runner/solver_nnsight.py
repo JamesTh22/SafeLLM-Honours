@@ -16,7 +16,6 @@ from .trace_writer import write_episode_trace
 @solver
 def safellm_react_with_trace(
     trace_path: Optional[str] = None,
-    max_steps: int = 20,
 ) -> Solver:
     agent = react(
         tools=[
@@ -24,8 +23,7 @@ def safellm_react_with_trace(
             write_file, make_dir, append_file, write_csv,
             done,
         ],
-        system_prompt=lambda state: state.metadata.get("system_prompt", ""),
-        max_steps=max_steps,
+        prompt=lambda state: state.metadata.get("system_prompt", ""),
     )
 
     async def solve(state: TaskState, generate: Generate) -> TaskState:
