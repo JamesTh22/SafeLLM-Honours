@@ -2,6 +2,7 @@
 jupyterlab>=4.0
 ipykernel>=6.0
 nest_asyncio>=1.6.0  # <--- CRITICAL FOR NOTEBOOKS
+ipywidgets>=8.0.0
 
 # --- Core runtime ---
 torch>=2.2.0

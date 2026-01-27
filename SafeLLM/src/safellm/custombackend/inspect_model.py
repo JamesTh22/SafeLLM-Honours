@@ -6,14 +6,11 @@ from inspect_ai.model import (
 )
 from .huggingface_nnsight import HuggingFaceNNSightBackend
 
-@modelapi("nnsight")
-def backendNNsight(model_name: str, **model_kwargs: Any) -> ModelAPI:  # routes inspect ai to custome backend 
-    return Backend(model_name, **model_kwargs)
-
+@modelapi(name="nnsight") # routes inspect ai to custome backend 
 class Backend(ModelAPI):
     def __init__(self, model_name: str, **kwargs):
-        super().__init__(model_name, **kwargs)
-        self.backendargs = kwargs                      # store the auguments for the backend 
+        super().__init__(model_name=model_name)
+        self.backend_args = kwargs                      # store the auguments for the backend 
         self.backend = None     
     async def generate(
         self, 
@@ -24,19 +21,19 @@ class Backend(ModelAPI):
     ) -> ModelOutput:
         
         if self.backend is None:
-            self.backend = HuggingFaceNNSightBackend(self.name, **self.backend_args)  # initisalise the backend only once
-            model_chat_message = [{"role": msg.role, "content": msg.content} for msg in input]
-            prompt = self.backend.tokenizer.apply_chat_template(            # coverts string in to a chat format for the model to understand
-                model_chat_message,                                         # uses the offical apply chat template this normlises stuff for different models
-                tokenize=False,                                             # since every model has it own config.json which is different       
-                add_generation_prompt=True
-            )
+            self.backend = HuggingFaceNNSightBackend(self.model_name, **self.backend_args)  # initisalise the backend only once
+        model_chat_message = [{"role": msg.role, "content": msg.content} for msg in input]
+        prompt = self.backend.tokenizer.apply_chat_template(            # coverts string in to a chat format for the model to understand
+            model_chat_message,                                         # uses the offical apply chat template this normlises stuff for different models
+            tokenize=False,                                             # since every model has it own config.json which is different       
+            add_generation_prompt=True
+        )
         def run_on_gpu():
             return self.backend.generateloop(prompt, config=config)
         result = await asyncio.to_thread(run_on_gpu)  # run the blocking gpu code in a thread
 
         return ModelOutput(
-            model_name=self.name,
+            model=self.model_name,
             completion=result["completion"],
             metadata={
                 "activation": result["activation"]
