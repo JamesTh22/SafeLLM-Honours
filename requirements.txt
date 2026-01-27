@@ -1,8 +1,10 @@
 # --- Notebook runtime 
 jupyterlab>=4.0
 ipykernel>=6.0
+nest_asyncio>=1.6.0  # <--- CRITICAL FOR NOTEBOOKS
 
 # --- Core runtime ---
+torch>=2.2.0
 python-dotenv>=1.0
 pyyaml>=6.0
 pydantic>=2.6
@@ -16,6 +18,8 @@ inspect-ai>=0.3.0
 transformers>=4.40
 accelerate>=0.30
 safetensors>=0.4
+bitsandbytes>=0.41.0 # <--- REQUIRED FOR 4-BIT QUANTIZATION
+sentencepiece>=0.2.0 # <--- REQUIRED FOR MISTRAL/LLAMA TOKENIZERS
 
 
 # --- Analysis ---
@@ -25,6 +29,7 @@ tqdm>=4.66
 
 # --- Activation/logit instrumentation ---
 nnsight>=0.3.0
+nnterp
 
 # --- Plotting ---
 matplotlib>=3.8
