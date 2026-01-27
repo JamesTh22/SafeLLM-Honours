@@ -77,3 +77,29 @@ class HuggingFaceNNSightBackend:
         self.tokenizer = self.model.tokenizer
         self.model_name.model = model_name
         global_loaded_model = self
+
+    def generateloop(self, prompt: str, **kwargs) -> Dict[str, Any]:
+        params = model_params(kwargs.get('config', None))
+        with self.model.trace(prompt):
+            hidden_states = self.model.layer_outputs[-1].outputs[0][0, -1, :].save() # last layer (-1) for the last token (-1)
+            model_output = self.model.generate(
+                max_new_tokens=params["max_new_tokens"],
+                temperature=params["temperature"],
+                top_p=params["top_p"],
+                do_sample=params["do_sample"],
+                frequency_penalty=params["frequency_penalty"],
+                presence_penalty=params["presence_penalty"],
+                stop_strings=params["stop_strings"], 
+                pad_token_id=self.tokenizer.eos_token_id # Prevents warnings
+            )
+        convert_tokens_back = self.tokenizer.decode(model_output[0], skip_special_tokens=True)
+
+        if convert_tokens_back.startswith(prompt):
+            convert_tokens_back = convert_tokens_back[len(prompt):]
+        else: 
+           convert_tokens_back = convert_tokens_back
+        return {
+            "response": convert_tokens_back,
+            "activations": hidden_states.value.cpu().clone()  # put the calculations on the cpu to save gpu memory 
+        }
+    
