@@ -100,6 +100,6 @@ class HuggingFaceNNSightBackend:
            convert_tokens_back = convert_tokens_back
         return {
             "response": convert_tokens_back,
-            "activations": hidden_states.value.cpu().clone()
+            "activations": hidden_states.value.cpu().clone()  # put the calculations on the cpu to save gpu memory 
         }
     
