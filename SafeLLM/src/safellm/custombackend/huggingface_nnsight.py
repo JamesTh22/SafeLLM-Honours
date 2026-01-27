@@ -24,9 +24,6 @@ def model_params(model_config: Any=None) -> Dict[str, Any]:
         "max_new_tokens": 2048, # if this to short model might stop mid response 
         "top_p": 0.95, # nucleus sampling do_sample must be true for this to work (controls word dictionary variety)
         "do_sample": True, # if false it will use greedy decoding mean it pick most likely next word every time
-        "frequency_penalty": 0.0, # stop repeating words / control of repetition
-        "presence_penalty": 0.0, # penalises a word if it has already been used like controlling topics
-        "stop_strings": None, # stop model based of specific tokens
     }
     if model_config:
         if hasattr(model_config, "temperature") and model_config.temperature is not None:
@@ -39,14 +36,6 @@ def model_params(model_config: Any=None) -> Dict[str, Any]:
             params["top_p"] = model_config.top_p                                                           # MAPPING TO INSPACT AI PARAM NAMES
         if hasattr(model_config, "do_sample") and model_config.do_sample is not None:
             params["do_sample"] = model_config.do_sample
-        if hasattr(model_config, "frequency_penalty") and model_config.frequency_penalty is not None:
-            params["frequency_penalty"] = model_config.frequency_penalty
-        if hasattr(model_config, "presence_penalty") and model_config.presence_penalty is not None:
-            params["presence_penalty"] = model_config.presence_penalty
-        if hasattr(model_config, "stop") and model_config.stop is not None:
-            params["stop_strings"] = model_config.stop
-        elif hasattr(model_config, "stop_strings") and model_config.stop_strings is not None:
-            params["stop_strings"] = model_config.stop_strings
 
     if params["temperature"] == 0:
         params["do_sample"] = False
@@ -81,19 +70,26 @@ class HuggingFaceNNSightBackend:
 
     def generateloop(self, prompt: str, **kwargs) -> Dict[str, Any]:
         params = model_params(kwargs.get('config', None))
-        with self.model.trace(prompt):
-            hidden_states = self.model.layers_output[-1].output[0][0, -1, :].save() # last layer (-1) for the last token (-1)
+        with self.model.trace(prompt, remote=False):
+            hidden_states = self.model.layers[-1].output[0].save() # last layer (-1) for the last token (-1)
+
             model_output = self.model.generate(
                 max_new_tokens=params["max_new_tokens"],
                 temperature=params["temperature"],
                 top_p=params["top_p"],
                 do_sample=params["do_sample"],
-                frequency_penalty=params["frequency_penalty"],
-                presence_penalty=params["presence_penalty"],
-                stop_strings=params["stop_strings"], 
                 pad_token_id=self.tokenizer.eos_token_id # Prevents warnings
             )
+
         convert_tokens_back = self.tokenizer.decode(model_output[0], skip_special_tokens=True)
+
+        tensor_shape = hidden_states.value
+        if len(tensor_shape.shape) == 3:  # If it's 3D take the last token.
+            final_activation = tensor_shape[:, -1, :]
+        elif len(tensor_shape.shape) == 2:
+            final_activation = tensor_shape[-1, :]
+        else:
+            final_activation = tensor_shape  # Unexpected shape
 
         if convert_tokens_back.startswith(prompt):
             completion = convert_tokens_back[len(prompt):]
@@ -101,6 +97,6 @@ class HuggingFaceNNSightBackend:
             completion = convert_tokens_back
         return {
             "completion": completion,
-            "activation": hidden_states.value.cpu().clone()  # put the calculations on the cpu to save gpu memory 
+            "activation": final_activation.detach().cpu().clone()  # put the calculations on the cpu to save gpu memory 
         }
     

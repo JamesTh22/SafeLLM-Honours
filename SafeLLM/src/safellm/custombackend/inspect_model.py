@@ -21,7 +21,15 @@ class Backend(ModelAPI):
     ) -> ModelOutput:
         
         if self.backend is None:
-            self.backend = HuggingFaceNNSightBackend(self.model_name, **self.backend_args)  # initisalise the backend only once
+            copyargs = self.backend_args.copy()
+            cleanargs = copyargs.copy()
+            cleanargs.pop("base_url", None) 
+            cleanargs.pop("api_key", None) # remove api_key from inspect ai
+            cleanargs.pop("config", None) # remove config from inspect ai
+            cleanargs.pop("max_tokens", None)
+
+
+            self.backend = HuggingFaceNNSightBackend(self.model_name, **cleanargs)  # initisalise the backend only once
         model_chat_message = [{"role": msg.role, "content": msg.content} for msg in input]
         prompt = self.backend.tokenizer.apply_chat_template(            # coverts string in to a chat format for the model to understand
             model_chat_message,                                         # uses the offical apply chat template this normlises stuff for different models
