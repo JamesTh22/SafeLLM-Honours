@@ -2,7 +2,12 @@
 import asyncio
 from typing import Any, List, Optional
 from inspect_ai.model import (
-    ModelAPI, modelapi, ModelOutput, ChatMessage
+    ModelAPI,
+    modelapi,
+    ModelOutput,
+    ChatMessage,
+    ChatMessageAssistant,
+    ChatCompletionChoice,
 )
 from .huggingface_nnsight import HuggingFaceNNSightBackend
 
@@ -40,9 +45,17 @@ class Backend(ModelAPI):
             return self.backend.generateloop(prompt, config=config)
         result = await asyncio.to_thread(run_on_gpu)  # run the blocking gpu code in a thread
 
+        choice = ChatCompletionChoice(
+            message=ChatMessageAssistant(
+                content=result["completion"],
+                model=self.model_name,
+                source="generate",
+            ),
+            stop_reason="stop",
+        )
         return ModelOutput(
             model=self.model_name,
-            completion=result["completion"],
+            choices=[choice],
             metadata={
                 "activation": result["activation"]
             }
