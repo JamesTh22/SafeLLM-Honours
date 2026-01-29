@@ -4,7 +4,7 @@ from typing import Any, List, Optional
 from inspect_ai.model import (
     ModelAPI, modelapi, ModelOutput, ChatMessage
 )
-from .huggingface_nnsight import HuggingFaceNNSightBackend
+from .huggingface_backend_hooks import HuggingFaceBackend
 
 @modelapi(name="nnsight") # routes inspect ai to custome backend 
 class Backend(ModelAPI):
