@@ -9,7 +9,7 @@ import yaml
 from inspect_ai import Task, task
 from inspect_ai.dataset import Sample
 
-from .solver_nnsight import safellm_react_with_trace
+from .react_solver import safellm_react_with_trace
 
 @dataclass
 class ScenarioSpec:
