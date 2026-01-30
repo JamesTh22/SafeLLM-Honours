@@ -42,7 +42,7 @@ def model_params(model_config: Any=None) -> Dict[str, Any]:
 
     return params
 
-class HuggingFaceNNSightBackend:
+class HuggingFaceBackend:
     def __init__(self, model_name: str, quantisation_4bit: bool = True):
         global global_loaded_model
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
