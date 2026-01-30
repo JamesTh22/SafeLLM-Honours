@@ -1,12 +1,4 @@
-# need torch (The Engine):
-# need safetensors / maybe compressed tensors (The Fuel):
-# need tokenizers (The Intake):
-# need transformers (The Chassis):
-# need accelerate (The Transmission):
-# need nnsight wrapper later (The Diagnostic Tool):
-# need to work for multiple different LLMs (The Versatile Body):
-
-## HUGGINGFACE BACKEND WITH NNTERP WHICH USES NNSIGHT FOR INTERPRETABILITY THIS BACKEND ##
+## HUGGINGFACE BACKEND##
 ## IS DESIGNED TO GIVE FULL ACCESS AND CONTROL ##
 
 from __future__ import annotations
@@ -72,36 +64,17 @@ class HuggingFaceBackend:
         self.model_name = model_name
         global_loaded_model = self
 
-    def generateloop(self, prompt: str, **kwargs) -> Dict[str, Any]:
-        params = model_params(kwargs.get('config', None))
+    def huggingface_generate_loop() # generates response from the model
 
-        with self.model.trace(prompt, remote=False):
-            hidden_states = self.model.layers[-1].output[0].save() # last layer (-1) for the last token (-1)
+    def get_model_layers() # identifes the layer of the model GPT-OSS(20b,120b),Gemma(4B,12B,27B),Llama(3B,7B,13B,70B),Mistral(14B,8B,3B) deepseek() qwen()
 
-            model_output = self.model.generate(
-                max_new_tokens=params["max_new_tokens"],
-                temperature=params["temperature"],
-                top_p=params["top_p"],
-                do_sample=params["do_sample"],
-                pad_token_id=self.tokenizer.eos_token_id # Prevents warnings
-            )
+    def get_model_activations() # gets activations from the model uses the get_model_layers() function
 
-        convert_tokens_back = self.tokenizer.decode(model_output[0], skip_special_tokens=True)
+    def get_logits() # gets logits from the model
 
-        tensor_shape = hidden_states.value
-        if len(tensor_shape.shape) == 3:  # If it's 3D take the last token.
-            final_activation = tensor_shape[:, -1, :]
-        elif len(tensor_shape.shape) == 2:
-            final_activation = tensor_shape[-1, :]
-        else:
-            final_activation = tensor_shape  # Unexpected shape
+    def create_activations_hooks() # creates activations hooks for the model
 
-        if convert_tokens_back.startswith(prompt):
-            completion = convert_tokens_back[len(prompt):]
-        else: 
-            completion = convert_tokens_back
-        return {
-            "completion": completion,
-            "activation": final_activation.detach().cpu().clone()  # put the calculations on the cpu to save gpu memory 
-        }
-    
+    def create_logits_hooks() # creates logits hooks for the model
+        
+
+
