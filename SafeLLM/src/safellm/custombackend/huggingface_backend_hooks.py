@@ -44,32 +44,37 @@ def model_params(model_config: Any=None) -> Dict[str, Any]:
 
 class HuggingFaceBackend:
     def __init__(self, model_name: str, quantisation_4bit: bool = True):
+        
         global global_loaded_model
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.model_name = model_name
+
         if global_loaded_model is not None and global_loaded_model.model_name == model_name:
             self.model = global_loaded_model.model
             self.tokenizer = global_loaded_model.tokenizer
             return
         quantization_config = None
+
         if quantisation_4bit:
             quantization_config = BitsAndBytesConfig(
                 load_in_4bit=True,
                 bnb_4bit_quant_type="nf4",    #nf4 is slightly better than fp4 for accuracy / this save more memory 
                 bnb_4bit_compute_dtype=torch.float16
             )    
-        self.model = StandardizedTransformer( # notes that is not "from pretrained" nnterp automatically handdles this
+        self.model = AutoModelForCausalLM.from_pretrained( # pre-trained model from huggingface hub
             model_name,
             quantization_config=quantization_config,
             device_map="auto", # allows accelerate to offload to CPU if GPU out of memory
             trust_remote_code=True # !!this can be a security risk (run verified models only)!!
         )
-        self.tokenizer = self.model.tokenizer
+
+        self.tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
         self.model_name = model_name
         global_loaded_model = self
 
     def generateloop(self, prompt: str, **kwargs) -> Dict[str, Any]:
         params = model_params(kwargs.get('config', None))
+
         with self.model.trace(prompt, remote=False):
             hidden_states = self.model.layers[-1].output[0].save() # last layer (-1) for the last token (-1)
 
