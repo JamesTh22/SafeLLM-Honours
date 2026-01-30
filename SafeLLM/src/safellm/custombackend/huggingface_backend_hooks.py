@@ -14,7 +14,7 @@ from typing import Any, Dict
 import torch
 import time
 from transformers import BitsAndBytesConfig
-from nnterp import StandardizedTransformer
+from transformers import AutoModelForCausalLM, AutoTokenizer
 
 global_loaded_model = None # stop re-loading model multiple times
 
