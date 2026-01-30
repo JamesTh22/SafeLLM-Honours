@@ -6,7 +6,7 @@ from inspect_ai.model import (
 )
 from .huggingface_backend_hooks import HuggingFaceBackend
 
-@modelapi(name="nnsight") # routes inspect ai to custome backend 
+@modelapi(name="huggingface") # routes inspect ai to custome backend 
 class Backend(ModelAPI):
     def __init__(self, model_name: str, **kwargs):
         super().__init__(model_name=model_name)
@@ -29,9 +29,9 @@ class Backend(ModelAPI):
             cleanargs.pop("max_tokens", None)
 
 
-            self.backend = HuggingFaceNNSightBackend(self.model_name, **cleanargs)  # initisalise the backend only once
-        model_chat_message = [{"role": msg.role, "content": msg.content} for msg in input]
-        prompt = self.backend.tokenizer.apply_chat_template(            # coverts string in to a chat format for the model to understand
+            self.backend = HuggingFaceBackend(self.model_name, **cleanargs)  # initisalise the backend only once
+            model_chat_message = [{"role": msg.role, "content": msg.content} for msg in input]
+            prompt = self.backend.tokenizer.apply_chat_template(            # coverts string in to a chat format for the model to understand
             model_chat_message,                                         # uses the offical apply chat template this normlises stuff for different models
             tokenize=False,                                             # since every model has it own config.json which is different       
             add_generation_prompt=True
